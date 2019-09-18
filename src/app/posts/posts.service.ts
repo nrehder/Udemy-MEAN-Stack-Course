@@ -24,4 +24,13 @@ export class PostsService {
 		this.posts.push({ title, content });
 		this.postsUpdated.next(this.getPosts());
 	}
+
+	deletePost(index: number) {
+		this.posts.splice(index);
+		this.postsUpdated.next(this.getPosts());
+	}
+
+	editPost(index: number, title: string, content: string) {
+		this.posts[index] = { title, content };
+	}
 }
