@@ -4,6 +4,7 @@ import {
 	MatCardModule,
 	MatButtonModule,
 	MatToolbarModule,
+	MatExpansionModule,
 } from "@angular/material";
 
 let matImports = [
@@ -11,6 +12,7 @@ let matImports = [
 	MatCardModule,
 	MatButtonModule,
 	MatToolbarModule,
+	MatExpansionModule,
 ];
 
 @NgModule({
