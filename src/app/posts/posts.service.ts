@@ -4,6 +4,7 @@ import { Subject } from "rxjs";
 import { map } from "rxjs/operators";
 
 import { Post } from "./post.model";
+import { Router } from "@angular/router";
 
 @Injectable({
 	providedIn: "root",
@@ -12,7 +13,7 @@ export class PostsService {
 	private posts: Post[] = [];
 	private postsUpdated = new Subject<Post[]>();
 
-	constructor(private httpClient: HttpClient) {}
+	constructor(private httpClient: HttpClient, private router: Router) {}
 
 	getPosts() {
 		this.httpClient
@@ -40,7 +41,7 @@ export class PostsService {
 	}
 
 	addPost(title: string, content: string) {
-		const post: Post = { title, content };
+		const post: Post = { title, content, id: null };
 		this.httpClient
 			.post<{ message: string; id: string }>(
 				"http://localhost:3000/api/posts",
@@ -49,8 +50,15 @@ export class PostsService {
 			.subscribe(res => {
 				post.id = res.id;
 				this.posts.push(post);
-				this.returnCopyPosts();
+				this.router.navigate(["/"]);
 			});
+	}
+	getPost(id: string) {
+		return this.httpClient.get<{
+			_id: string;
+			title: string;
+			content: string;
+		}>("http://localhost:3000/api/posts/" + id);
 	}
 
 	deletePost(id: string) {
@@ -62,8 +70,13 @@ export class PostsService {
 			});
 	}
 
-	editPost(index: number, title: string, content: string) {
-		this.posts[index] = { title, content };
+	updatePost(id: string, title: string, content: string) {
+		const post: Post = { id, title, content };
+		this.httpClient
+			.put("http://localhost:3000/api/posts/" + id, post)
+			.subscribe(res => {
+				this.router.navigate(["/"]);
+			});
 	}
 
 	private returnCopyPosts() {

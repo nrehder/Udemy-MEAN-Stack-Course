@@ -5,6 +5,7 @@ import {
 	MatButtonModule,
 	MatToolbarModule,
 	MatExpansionModule,
+	MatProgressSpinnerModule,
 } from "@angular/material";
 
 let matImports = [
@@ -13,6 +14,7 @@ let matImports = [
 	MatButtonModule,
 	MatToolbarModule,
 	MatExpansionModule,
+	MatProgressSpinnerModule,
 ];
 
 @NgModule({
