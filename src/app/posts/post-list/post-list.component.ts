@@ -31,7 +31,7 @@ export class PostListComponent implements OnInit, OnDestroy {
 	onEdit(index: number) {
 		console.log("edit post " + index);
 	}
-	onDelete(index: number) {
-		this.postsService.deletePost(index);
+	onDelete(id: string) {
+		this.postsService.deletePost(id);
 	}
 }
