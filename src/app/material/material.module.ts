@@ -6,6 +6,7 @@ import {
 	MatToolbarModule,
 	MatExpansionModule,
 	MatProgressSpinnerModule,
+	MatPaginatorModule,
 } from "@angular/material";
 
 let matImports = [
@@ -15,6 +16,7 @@ let matImports = [
 	MatToolbarModule,
 	MatExpansionModule,
 	MatProgressSpinnerModule,
+	MatPaginatorModule,
 ];
 
 @NgModule({

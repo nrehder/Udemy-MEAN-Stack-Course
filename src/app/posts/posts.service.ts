@@ -11,30 +11,35 @@ import { Router } from "@angular/router";
 })
 export class PostsService {
 	private posts: Post[] = [];
-	private postsUpdated = new Subject<Post[]>();
+	private postsUpdated = new Subject<{ posts: Post[]; postCount: number }>();
 
 	constructor(private httpClient: HttpClient, private router: Router) {}
 
-	getPosts() {
+	getPosts(postsPerPage: number, currentPage: number) {
+		const queryParams =
+			"?pagesize=" + postsPerPage + "&page=" + currentPage;
 		this.httpClient
-			.get<{ message: string; posts: any }>(
-				"http://localhost:3000/api/posts"
+			.get<{ message: string; posts: any; maxPosts: number }>(
+				"http://localhost:3000/api/posts" + queryParams
 			)
 			.pipe(
 				map(postData => {
-					return postData.posts.map(post => {
-						return {
-							title: post.title,
-							content: post.content,
-							id: post._id,
-							imagePath: post.imagePath,
-						};
-					});
+					return {
+						posts: postData.posts.map(post => {
+							return {
+								title: post.title,
+								content: post.content,
+								id: post._id,
+								imagePath: post.imagePath,
+							};
+						}),
+						maxPosts: postData.maxPosts,
+					};
 				})
 			)
 			.subscribe(returnedPosts => {
-				this.posts = returnedPosts;
-				this.returnCopyPosts();
+				this.posts = returnedPosts.posts;
+				this.returnCopyPosts(returnedPosts.maxPosts);
 			});
 	}
 	getPostUpdateListener() {
@@ -53,15 +58,6 @@ export class PostsService {
 				postData
 			)
 			.subscribe(res => {
-				console.log(res);
-				const post: Post = {
-					id: res.post.id,
-					title: res.post.title,
-					content: res.post.content,
-					imagePath: res.post.imagePath,
-				};
-				console.log(post);
-				this.posts.push(post);
 				this.router.navigate(["/"]);
 			});
 	}
@@ -75,12 +71,7 @@ export class PostsService {
 	}
 
 	deletePost(id: string) {
-		this.httpClient
-			.delete("http://localhost:3000/api/posts/" + id)
-			.subscribe(res => {
-				this.posts = this.posts.filter(post => post.id !== id);
-				this.returnCopyPosts();
-			});
+		return this.httpClient.delete("http://localhost:3000/api/posts/" + id);
 	}
 
 	updatePost(
@@ -112,11 +103,11 @@ export class PostsService {
 			});
 	}
 
-	private returnCopyPosts() {
+	private returnCopyPosts(postCount: number) {
 		let copyPosts: Post[] = [];
 		this.posts.forEach(value => {
 			copyPosts.push({ ...value });
 		});
-		this.postsUpdated.next(copyPosts);
+		this.postsUpdated.next({ posts: copyPosts, postCount });
 	}
 }
