@@ -1,9 +1,12 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { NgForm } from "@angular/forms";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
+
 import { Subscription } from "rxjs";
+
 import { PostsService } from "../posts.service";
 import { Post } from "../post.model";
+import { mimeType } from "./mime-type.validator";
 
 @Component({
 	selector: "app-post-create",
@@ -11,11 +14,18 @@ import { Post } from "../post.model";
 	styleUrls: ["./post-create.component.css"],
 })
 export class PostCreateComponent implements OnInit, OnDestroy {
+	//editing post variables
 	private id: string;
-	private editMode: string = "create";
 	post: Post;
 	paramsSubscription: Subscription;
+
+	//core variables
 	loading: boolean = false;
+	private editMode: string = "create";
+
+	//form variables
+	postForm: FormGroup;
+	imagePreview: string;
 
 	constructor(
 		private postsService: PostsService,
@@ -23,6 +33,19 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit() {
+		this.postForm = new FormGroup({
+			title: new FormControl(null, {
+				validators: [Validators.required, Validators.minLength(3)],
+			}),
+			content: new FormControl(null, {
+				validators: [Validators.required],
+			}),
+			image: new FormControl(null, {
+				validators: [Validators.required],
+				asyncValidators: [mimeType],
+			}),
+		});
+
 		this.paramsSubscription = this.route.paramMap.subscribe(
 			(paramMap: ParamMap) => {
 				if (paramMap.has("id")) {
@@ -35,7 +58,13 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 							id: post._id,
 							title: post.title,
 							content: post.content,
+							imagePath: post.imagePath,
 						};
+						this.postForm.setValue({
+							title: this.post.title,
+							content: this.post.content,
+							image: this.post.imagePath,
+						});
 					});
 				} else {
 					this.editMode = "creating";
@@ -50,17 +79,33 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 		this.paramsSubscription.unsubscribe();
 	}
 
-	onSavePost(form: NgForm) {
+	onSavePost() {
 		this.loading = true;
 		if (this.editMode === "creating") {
-			this.postsService.addPost(form.value.title, form.value.content);
+			this.postsService.addPost(
+				this.postForm.value.title,
+				this.postForm.value.content,
+				this.postForm.value.image
+			);
 		} else {
 			this.postsService.updatePost(
 				this.id,
-				form.value.title,
-				form.value.content
+				this.postForm.value.title,
+				this.postForm.value.content,
+				this.postForm.value.image
 			);
 		}
-		form.resetForm();
+		this.postForm.reset();
+	}
+
+	onImagedPicked(event: Event) {
+		const file = (event.target as HTMLInputElement).files[0];
+		this.postForm.patchValue({ image: file });
+		this.postForm.get("image").updateValueAndValidity();
+		const reader = new FileReader();
+		reader.onload = () => {
+			this.imagePreview = reader.result as string;
+		};
+		reader.readAsDataURL(file);
 	}
 }
