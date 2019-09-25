@@ -7,6 +7,7 @@ import { Subscription } from "rxjs";
 import { PostsService } from "../posts.service";
 import { Post } from "../post.model";
 import { mimeType } from "./mime-type.validator";
+import { AuthService } from "src/app/auth/auth.service";
 
 @Component({
 	selector: "app-post-create",
@@ -17,7 +18,8 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 	//editing post variables
 	private id: string;
 	post: Post;
-	paramsSubscription: Subscription;
+	private paramsSubscription: Subscription;
+	private authStatusSub: Subscription;
 
 	//core variables
 	loading: boolean = false;
@@ -29,7 +31,8 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private postsService: PostsService,
-		private route: ActivatedRoute
+		private route: ActivatedRoute,
+		private authService: AuthService
 	) {}
 
 	ngOnInit() {
@@ -45,6 +48,12 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 				asyncValidators: [mimeType],
 			}),
 		});
+
+		this.authStatusSub = this.authService
+			.getAuthStatusListener()
+			.subscribe(status => {
+				this.loading = false;
+			});
 
 		this.paramsSubscription = this.route.paramMap.subscribe(
 			(paramMap: ParamMap) => {
@@ -78,6 +87,7 @@ export class PostCreateComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy() {
 		this.paramsSubscription.unsubscribe();
+		this.authStatusSub.unsubscribe();
 	}
 
 	onSavePost() {

@@ -16,9 +16,11 @@ import { PostCreateComponent } from "./posts/post-create/post-create.component";
 import { PostListComponent } from "./posts/post-list/post-list.component";
 import { SignupComponent } from "./auth/signup/signup.component";
 import { LoginComponent } from "./auth/login/login.component";
+import { ErrorComponent } from "./error/error.component";
 
 //Directives, Interceptors, etc
 import { AuthInterceptor } from "./auth/auth-interceptor";
+import { ErrorInterceptor } from "./error-interceptor";
 
 @NgModule({
 	declarations: [
@@ -28,6 +30,7 @@ import { AuthInterceptor } from "./auth/auth-interceptor";
 		PostListComponent,
 		SignupComponent,
 		LoginComponent,
+		ErrorComponent,
 	],
 	imports: [
 		BrowserModule,
@@ -40,7 +43,9 @@ import { AuthInterceptor } from "./auth/auth-interceptor";
 	],
 	providers: [
 		{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+		{ provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
 	],
 	bootstrap: [AppComponent],
+	entryComponents: [ErrorComponent],
 })
 export class AppModule {}

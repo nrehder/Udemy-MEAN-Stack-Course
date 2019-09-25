@@ -34,9 +34,14 @@ export class AuthService {
 				email,
 				password,
 			})
-			.subscribe(res => {
-				console.log(res);
-			});
+			.subscribe(
+				res => {
+					this.loginUser(email, password);
+				},
+				err => {
+					this.authStatusListener.next(false);
+				}
+			);
 	}
 
 	loginUser(email: string, password: string) {
@@ -48,26 +53,31 @@ export class AuthService {
 					password,
 				}
 			)
-			.subscribe(res => {
-				this.token = res.token;
-				if (this.token) {
-					const expiresIn = res.expiresIn;
-					//creates auto logout timer
-					this.setLogoutTimer(expiresIn);
+			.subscribe(
+				res => {
+					this.token = res.token;
+					if (this.token) {
+						const expiresIn = res.expiresIn;
+						//creates auto logout timer
+						this.setLogoutTimer(expiresIn);
 
-					//updates auth status and notifies other components
-					this.authStatus = true;
-					this.authStatusListener.next(true);
-					this.userId = res.userId;
+						//updates auth status and notifies other components
+						this.authStatus = true;
+						this.authStatusListener.next(true);
+						this.userId = res.userId;
 
-					//saves auth data to local storage
+						//saves auth data to local storage
 
-					this.saveAuthData(expiresIn);
+						this.saveAuthData(expiresIn);
 
-					//navigates to home page
-					this.router.navigate(["/"]);
+						//navigates to home page
+						this.router.navigate(["/"]);
+					}
+				},
+				err => {
+					this.authStatusListener.next(false);
 				}
-			});
+			);
 	}
 
 	logoutUser() {

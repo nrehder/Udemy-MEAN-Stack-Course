@@ -21,7 +21,7 @@ router.post("/signup", (req, res, next) => {
 			})
 			.catch(err => {
 				res.status(500).json({
-					error: err,
+					message: "User already exists!",
 				});
 			});
 	});
@@ -32,7 +32,9 @@ router.post("/login", (req, res, next) => {
 	User.findOne({ email: req.body.email })
 		.then(user => {
 			if (!user) {
-				return res.status(401).json({ message: "Email not found!" });
+				return res
+					.status(401)
+					.json({ message: "Email or password was incorrect!" });
 			}
 
 			fetchedUser = user;
@@ -40,7 +42,9 @@ router.post("/login", (req, res, next) => {
 		})
 		.then(result => {
 			if (!result) {
-				return res.status(401).json({ message: "Password incorrect!" });
+				return res
+					.status(401)
+					.json({ message: "Email or password was incorrect!" });
 			}
 			const token = jwt.sign(
 				{
@@ -57,7 +61,9 @@ router.post("/login", (req, res, next) => {
 			});
 		})
 		.catch(err => {
-			res.status(401).json({ message: "Auth failed!" });
+			res.status(401).json({
+				message: "Invalid authentication credentials!",
+			});
 		});
 });
 
