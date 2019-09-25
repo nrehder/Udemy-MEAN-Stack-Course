@@ -4,9 +4,41 @@
 			Messages App
 		</a>
 	</span>
-	<span>
-		<a mat-button routerLink="/create" routerLinkActive="mat-accent">
-			Create
-		</a>
-	</span>
+	<ul>
+		<li>
+			<a
+				mat-button
+				routerLink="/create"
+				routerLinkActive="mat-accent"
+				*ngIf="authStatus"
+			>
+				Create Post
+			</a>
+		</li>
+		<li>
+			<button mat-button *ngIf="authStatus" (click)="onLogout()">
+				Log Out
+			</button>
+		</li>
+		<li>
+			<a
+				mat-button
+				routerLink="/login"
+				routerLinkActive="mat-accent"
+				*ngIf="!authStatus"
+			>
+				Login
+			</a>
+		</li>
+		<li>
+			<a
+				mat-button
+				routerLink="/signup"
+				routerLinkActive="mat-accent"
+				*ngIf="!authStatus"
+			>
+				Sign Up
+			</a>
+		</li>
+	</ul>
 </mat-toolbar>
