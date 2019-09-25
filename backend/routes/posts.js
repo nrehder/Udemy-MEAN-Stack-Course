@@ -30,6 +30,7 @@ const storage = multer.diskStorage({
 	},
 });
 
+//get all posts for current page
 router.get("", (req, res, next) => {
 	const pageSize = +req.query.pagesize;
 	const currentPage = +req.query.page;
@@ -58,6 +59,7 @@ router.get("", (req, res, next) => {
 		});
 });
 
+//get specific post (used for edit post page)
 router.get("/:id", (req, res, next) => {
 	Post.findById(req.params.id)
 		.then(post => {
@@ -73,6 +75,7 @@ router.get("/:id", (req, res, next) => {
 		});
 });
 
+//create a new post
 router.post(
 	"",
 	checkAuth,
@@ -83,21 +86,15 @@ router.post(
 			title: req.body.title,
 			content: req.body.content,
 			imagePath: url + "/images/" + req.file.filename,
+			creator: req.userData.userId,
 		});
 		newPost.save().then(result => {
-			res.status(201).json({
-				message: "Post added successfully!",
-				post: {
-					title: newPost.title,
-					content: newPost.content,
-					imagePath: newPost.imagePath,
-					id: newPost._id,
-				},
-			});
+			res.status(201).json({ message: "Post added successfully!" });
 		});
 	}
 );
 
+//edit a specific post
 router.put(
 	"/:id",
 	checkAuth,
@@ -113,21 +110,32 @@ router.put(
 			title: req.body.title,
 			content: req.body.content,
 			imagePath,
+			creator: userData.userId,
 		});
-		Post.updateOne({ _id: req.params.id }, post).then(result => {
-			res.status(200).json({ message: "Update successful" });
+		Post.updateOne(
+			{ _id: req.params.id, creator: req.userData.userId },
+			post
+		).then(result => {
+			if (result.nModified > 0) {
+				res.status(200).json({ message: "Update successful" });
+			} else {
+				res.status(401).json({ message: "Not Authorized!" });
+			}
 		});
 	}
 );
 
+//delete a post
 router.delete("/:id", checkAuth, (req, res, next) => {
-	Post.deleteOne({ _id: req.params.id })
-		.then(response => {
-			res.status(200).json({ message: "Post deleted!" });
-		})
-		.catch(err => {
-			console.log(err);
-		});
+	Post.deleteOne({ _id: req.params.id, creator: req.userData.userId }).then(
+		result => {
+			if (result.n > 0) {
+				res.status(200).json({ message: "Post deleted!" });
+			} else {
+				res.status(401).json({ message: "Not Authorized!" });
+			}
+		}
+	);
 });
 
 module.exports = router;
