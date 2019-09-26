@@ -8,7 +8,7 @@
 		<li>
 			<a
 				mat-button
-				routerLink="/create"
+				routerLink="create"
 				routerLinkActive="mat-accent"
 				*ngIf="authStatus"
 			>
@@ -23,7 +23,7 @@
 		<li>
 			<a
 				mat-button
-				routerLink="/login"
+				routerLink="user/login"
 				routerLinkActive="mat-accent"
 				*ngIf="!authStatus"
 			>
@@ -33,7 +33,7 @@
 		<li>
 			<a
 				mat-button
-				routerLink="/signup"
+				routerLink="user/signup"
 				routerLinkActive="mat-accent"
 				*ngIf="!authStatus"
 			>
