@@ -1,1 +1,1 @@
-Built along with Udemy course on using Angular alongside NodeJS/ExpressJS.  Course ended with deploying in 2 separate methods, only have the integrated approach still uploaded at http://udemymeanstackcourseintegrated-env.acina86gbt.us-east-2.elasticbeanstalk.com/
+Built along with Udemy course on using Angular alongside NodeJS/ExpressJS.
